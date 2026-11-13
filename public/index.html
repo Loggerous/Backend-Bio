@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Обо мне</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  <div id="bg-overlay"></div>
+  <audio id="bg-music" loop preload="auto"></audio>
+
+  <!-- Навигация (скрывается в compact) -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand" id="nav-brand">Имя Фамилия</div>
+    <ul class="nav-links">
+      <li><a href="#home">Главная</a></li>
+      <li><a href="#skills">Навыки</a></li>
+      <li><a href="#projects">Проекты</a></li>
+      <li><a href="#contact">Контакты</a></li>
+    </ul>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ===== COMPACT MODE ===== -->
+  <div id="compact-view" class="compact-view hidden">
+    <div class="compact-card glass-island">
+      <div class="compact-avatar-wrap">
+        <img id="compact-avatar" src="" alt="Аватар" />
+        <div class="avatar-ring"></div>
+        <div id="discord-status-dot" class="status-dot offline" title="Discord"></div>
+      </div>
+      <h1 class="hero-name" id="compact-name">Имя Фамилия</h1>
+      <p class="hero-title" id="compact-title">Разработчик</p>
+      <p class="hero-tagline" id="compact-tagline"></p>
+
+      <div class="compact-meta" id="compact-meta"></div>
+
+      <!-- Discord status card -->
+      <div class="discord-card glass-island" id="discord-card">
+        <img id="discord-avatar" class="discord-avatar" src="" alt="" />
+        <div class="discord-info">
+          <span id="discord-name" class="discord-name">Discord</span>
+          <span id="discord-tag" class="discord-tag"></span>
+          <span id="discord-status" class="discord-status">offline</span>
+        </div>
+      </div>
+
+      <!-- Discord logo -->
+      <div class="discord-logo-wrap hidden" id="discord-logo">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+        </svg>
+      </div>
+
+      <!-- Music player -->
+      <div class="music-player-bar glass-island" id="music-player-compact">
+        <img id="music-cover-compact" class="music-cover" src="" alt="" />
+        <div class="music-main">
+          <div class="music-title-row">
+            <span id="music-title-compact">Фоновая музыка</span>
+          </div>
+          <div class="music-bar"><div class="music-progress" id="music-progress-compact"></div></div>
+          <div class="music-times">
+            <span id="music-current-compact">0:00</span>
+            <span id="music-duration-compact">0:00</span>
+          </div>
+        </div>
+        <div class="music-controls">
+          <button id="music-toggle-compact" class="music-btn" title="Музыка">
+            <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skills-grid compact-skills" id="compact-skills"></div>
+
+      <div class="socials icon-socials" id="compact-socials"></div>
+
+      <div class="compact-actions">
+        <a href="#" class="btn btn-primary" id="compact-email">Написать</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== NORMAL MODE ===== -->
+  <div id="normal-view">
+    <header id="home" class="hero">
+      <div class="hero-content">
+        <div class="avatar-wrap">
+          <img id="avatar" src="https://api.dicebear.com/9.x/avataaars/svg?seed=Alex" alt="Аватар" width="512" height="512" />
+          <div class="avatar-ring"></div>
+        </div>
+        <h1 class="hero-name" id="hero-name">Имя Фамилия</h1>
+        <p class="hero-title" id="hero-title">Разработчик · Дизайнер · Создатель</p>
+        <p class="hero-tagline" id="hero-tagline">Привет! Это мой личный сайт.</p>
+
+        <!-- Discord badge -->
+        <div class="discord-badge glass-island" id="discord-badge">
+          <img id="discord-avatar-normal" class="discord-avatar-sm" src="" alt="" />
+          <div>
+            <span id="discord-name-normal" class="discord-name"></span>
+            <span id="discord-status-normal" class="discord-status"></span>
+          </div>
+        </div>
+
+        <!-- Music player -->
+        <div class="music-player-bar glass-island" id="music-player">
+          <img id="music-cover" class="music-cover" src="" alt="" />
+          <div class="music-main">
+            <div class="music-title-row">
+              <span id="music-title">Фоновая музыка</span>
+            </div>
+            <div class="music-bar"><div class="music-progress" id="music-progress"></div></div>
+            <div class="music-times">
+              <span id="music-current">0:00</span>
+              <span id="music-duration">0:00</span>
+            </div>
+          </div>
+          <div class="music-controls">
+            <button id="music-toggle" class="music-btn" title="Музыка">
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <div class="volume-wrap">
+              <svg class="vol-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+              <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.6" />
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#skills" class="btn btn-primary">Навыки</a>
+          <a href="#contact" class="btn btn-outline">Связаться</a>
+        </div>
+      </div>
+      <div class="scroll-indicator"><span></span></div>
+    </header>
+
+    <!-- Навыки -->
+    <section id="skills" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">Навыки</h2>
+        <div class="skills-grid" id="skills-grid"></div>
+      </div>
+    </section>
+
+    <!-- Проекты -->
+    <section id="projects" class="section">
+      <div class="container">
+        <h2 class="section-title">Проекты</h2>
+        <div class="projects-grid" id="projects-grid"></div>
+      </div>
+    </section>
+
+    <!-- Контакты -->
+    <section id="contact" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">Контакты</h2>
+        <p class="contact-intro" id="contact-intro">Буду рад новым знакомствам и интересным проектам.</p>
+        <div class="socials icon-socials" id="socials"></div>
+        <a href="mailto:hello@example.com" class="btn btn-primary" id="email-btn">Написать письмо</a>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>© <span id="year"></span> <span id="footer-name">Имя Фамилия</span>. Сделано с ❤️</p>
+    </footer>
+  </div>
+
+  <!-- Кнопка настроек -->
+  <button class="settings-btn" id="settings-btn" title="Настройки">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  </button>
+
+  <!-- Модалка входа -->
+  <div class="modal" id="login-modal">
+    <div class="modal-content glass-island">
+      <h3>Вход в настройки</h3>
+      <p class="modal-hint">Введи пароль (по умолчанию: <code>admin123</code>)</p>
+      <input type="password" id="admin-password" placeholder="Пароль" autocomplete="off" />
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="login-cancel">Отмена</button>
+        <button class="btn btn-primary" id="login-submit">Войти</button>
+      </div>
+      <p class="error-msg" id="login-error"></p>
+    </div>
+  </div>
+
+  <!-- Панель настроек -->
+  <div class="modal settings-modal" id="settings-modal">
+    <div class="modal-content settings-content glass-island">
+      <div class="settings-header">
+        <h3>Настройки сайта</h3>
+        <button class="close-btn" id="settings-close">×</button>
+      </div>
+
+      <div class="settings-tabs">
+        <button class="tab active" data-tab="profile">Профиль</button>
+        <button class="tab" data-tab="appearance">Внешний вид</button>
+        <button class="tab" data-tab="media">Медиа</button>
+        <button class="tab" data-tab="content">Контент</button>
+        <button class="tab" data-tab="discord">Discord</button>
+        <button class="tab" data-tab="security">Безопасность</button>
+      </div>
+
+      <div class="settings-body">
+        <!-- Профиль -->
+        <div class="tab-pane active" id="tab-profile">
+          <label>Имя</label>
+          <input type="text" id="set-name" />
+
+          <label>Заголовок / должность</label>
+          <input type="text" id="set-title" />
+
+          <label>Краткое описание</label>
+          <textarea id="set-tagline" rows="2"></textarea>
+
+          <label>Город</label>
+          <input type="text" id="set-city" />
+
+          <label>Возраст</label>
+          <input type="text" id="set-age" />
+
+          <label>Опыт</label>
+          <input type="text" id="set-exp" />
+
+          <label>Статус</label>
+          <input type="text" id="set-status" />
+
+          <label>URL аватара (рекомендуется 512×512)</label>
+          <input type="url" id="set-avatar" placeholder="https://..." />
+
+          <label>Email для кнопки</label>
+          <input type="email" id="set-email" />
+
+          <label>Режим отображения</label>
+          <select id="set-mode">
+            <option value="normal">Обычный</option>
+            <option value="compact">Компактный (Liquid Glass)</option>
+          </select>
+        </div>
+
+        <!-- Внешний вид -->
+        <div class="tab-pane" id="tab-appearance">
+          <label>Основной цвет</label>
+          <div class="color-row">
+            <input type="color" id="set-primary" />
+            <input type="text" id="set-primary-hex" />
+          </div>
+
+          <label>Акцентный цвет</label>
+          <div class="color-row">
+            <input type="color" id="set-accent" />
+            <input type="text" id="set-accent-hex" />
+          </div>
+
+          <label>Цвет текста</label>
+          <div class="color-row">
+            <input type="color" id="set-text" />
+            <input type="text" id="set-text-hex" />
+          </div>
+
+          <label>URL фоновой картинки</label>
+          <input type="url" id="set-bg" placeholder="https://images.unsplash.com/..." />
+
+          <label>Прозрачность фона (0–1)</label>
+          <input type="range" id="set-bg-opacity" min="0" max="1" step="0.05" />
+          <span id="bg-opacity-val">0.4</span>
+
+          <label>Интенсивность частиц</label>
+          <input type="range" id="set-particles" min="40" max="250" step="10" />
+          <span id="particles-val">160</span>
+
+          <label>Радиус скругления «островков» (px)</label>
+          <input type="range" id="set-radius" min="8" max="40" step="1" />
+          <span id="radius-val">22</span>
+        </div>
+
+        <!-- Медиа -->
+        <div class="tab-pane" id="tab-media">
+          <label>URL музыки (mp3 / ogg)</label>
+          <input type="url" id="set-music" placeholder="https://.../track.mp3" />
+
+          <label>Название трека</label>
+          <input type="text" id="set-music-title" />
+
+          <label>Обложка трека / аватар музыки (URL, желательно квадрат)</label>
+          <input type="url" id="set-music-avatar" placeholder="https://.../cover.jpg" />
+
+          <p class="hint">Можно вставлять ссылки с Dropbox, Google Drive, GitHub, Cloudinary. Для Dropbox — обычную ссылку «Поделиться».</p>
+        </div>
+
+        <!-- Контент -->
+        <div class="tab-pane" id="tab-content">
+          <label>Навыки (через запятую)</label>
+          <input type="text" id="set-skills" placeholder="HTML, CSS, JavaScript, React..." />
+
+          <label>Проекты (JSON-массив)</label>
+          <textarea id="set-projects" rows="6" placeholder='[{"title":"Проект 1","desc":"Описание","link":"#"}]'></textarea>
+
+          <label>Соцсети (JSON) — иконки-кнопки</label>
+          <textarea id="set-socials" rows="5" placeholder='[{"name":"Telegram","url":"https://t.me/...","icon":"✈️"}]'></textarea>
+        </div>
+
+        <!-- Discord -->
+        <div class="tab-pane" id="tab-discord">
+          <label>Ссылка на профиль Discord или User ID</label>
+          <input type="text" id="set-discord-id" placeholder="https://discord.com/users/123... или просто ID" />
+          <p class="hint">
+            Вставь ссылку вида <code>https://discord.com/users/USER_ID</code> или просто числовой User ID.<br>
+            Чтобы статус работал в реальном времени — зайди на <a href="https://discord.gg/UrXF2cfJ7F" target="_blank" rel="noopener">сервер Lanyard</a> и скопируй свой ID (Режим разработчика → ПКМ по себе → Копировать ID).
+          </p>
+        </div>
+
+        <!-- Безопасность + remote -->
+        <div class="tab-pane" id="tab-security">
+          <label>Новый пароль для настроек</label>
+          <input type="password" id="set-new-password" placeholder="Оставьте пустым, чтобы не менять" />
+          <p class="hint">Пароль хранится только в браузере (localStorage). Это не защита от «Кода элемента».</p>
+
+          <label>URL удалённого конфига (для всех посетителей)</label>
+          <input type="url" id="set-remote-url" placeholder="https://api.npoint.io/xxxxx или raw GitHub" />
+          <p class="hint">
+            Положи JSON-конфиг (тот же формат, что DEFAULTS) на npoint.io / JSONBin / GitHub raw.
+            Сайт при загрузке подтянет его и применит для всех. Запись с сайта в облако — только через кнопку «Код для всех» + ручная загрузка.
+          </p>
+        </div>
+      </div>
+
+      <div class="settings-footer">
+        <button class="btn btn-outline" id="settings-reset">Сбросить</button>
+        <button class="btn btn-outline" id="settings-export" title="Скопировать код DEFAULTS">Код для всех</button>
+        <button class="btn btn-primary" id="settings-save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
