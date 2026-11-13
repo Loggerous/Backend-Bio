@@ -4,58 +4,180 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Админка</title>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #0a0a0a;
-      color: #eee;
-      min-height: 100vh;
-      padding: 40px 16px;
+    :root {
+      --primary: #7c8cff;
+      --accent: #c084fc;
+      --bg: #050505;
+      --text: #f0f0f0;
+      --muted: #9ca3af;
+      --radius: 20px;
     }
-    .container { max-width: 640px; margin: 0 auto; }
-    h1 { margin-bottom: 8px; font-size: 1.6rem; }
-    .subtitle { color: #888; margin-bottom: 28px; font-size: 0.95rem; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Unbounded', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Жидкое стекло */
+    .glass {
+      background: linear-gradient(145deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.04) 100%);
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      box-shadow:
+        0 8px 32px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.22),
+        inset 0 -1px 0 rgba(255,255,255,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 42%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), transparent);
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    .glass > * { position: relative; z-index: 2; }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 16px 80px;
+    }
+
+    h1 {
+      font-size: 1.7rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #fff, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 28px;
+    }
+
     label {
       display: block;
-      margin: 18px 0 6px;
-      font-size: 0.85rem;
-      color: #aaa;
+      margin: 18px 0 7px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 500;
     }
+
     input, textarea, select {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid #333;
-      background: #161616;
-      color: #fff;
+      padding: 13px 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
       font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
     }
-    input:focus, textarea:focus {
+
+    input:focus, textarea:focus, select:focus {
       outline: none;
-      border-color: #6366f1;
+      border-color: var(--primary);
     }
-    button {
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       width: 100%;
-      padding: 14px;
-      margin-top: 24px;
+      padding: 15px;
+      margin-top: 28px;
       border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
       color: white;
       font-weight: 600;
       font-size: 1rem;
+      font-family: inherit;
       cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(124,140,255,0.35);
     }
-    button:hover { opacity: 0.92; }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(124,140,255,0.5);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: none;
+      margin-top: 12px;
+    }
+
     .hidden { display: none !important; }
-    #error { color: #f87171; margin-top: 12px; min-height: 20px; }
-    #status { margin-top: 14px; color: #4ade80; min-height: 20px; }
+
+    #error { color: #f87171; margin-top: 14px; min-height: 20px; font-size: 0.9rem; }
+    #status { margin-top: 16px; color: #4ade80; min-height: 22px; font-size: 0.9rem; }
+
     .card {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 16px;
-      padding: 28px;
+      padding: 32px 28px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin: 32px 0 8px;
+      color: var(--primary);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 8px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .card { padding: 24px 18px; }
+    }
+
+    .color-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .color-row input[type="color"] {
+      width: 52px;
+      height: 44px;
+      padding: 4px;
+      border-radius: 10px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -63,18 +185,20 @@
   <div class="container">
 
     <!-- Вход -->
-    <div id="login" class="card">
-      <h1>Вход в админку</h1>
+    <div id="login" class="card glass">
+      <h1>Админка</h1>
       <p class="subtitle">Пароль по умолчанию: <b>admin123</b></p>
-      <input type="password" id="password" placeholder="Пароль" autocomplete="current-password">
-      <button onclick="login()">Войти</button>
+      <input type="password" id="password" placeholder="Введите пароль" autocomplete="current-password">
+      <button class="btn" onclick="login()">Войти</button>
       <p id="error"></p>
     </div>
 
     <!-- Панель -->
-    <div id="panel" class="card hidden">
+    <div id="panel" class="card glass hidden">
       <h1>Редактор сайта</h1>
-      <p class="subtitle">Изменения сразу видны всем посетителям</p>
+      <p class="subtitle">Все изменения сразу видны посетителям</p>
+
+      <div class="section-title">Профиль</div>
 
       <label>Имя</label>
       <input id="name">
@@ -85,31 +209,60 @@
       <label>Краткое описание</label>
       <textarea id="tagline" rows="2"></textarea>
 
-      <label>Город</label>
-      <input id="city">
+      <div class="grid-2">
+        <div>
+          <label>Город</label>
+          <input id="city">
+        </div>
+        <div>
+          <label>Возраст</label>
+          <input id="age">
+        </div>
+      </div>
 
-      <label>Возраст</label>
-      <input id="age">
-
-      <label>Опыт</label>
-      <input id="exp">
-
-      <label>Статус</label>
-      <input id="status">
+      <div class="grid-2">
+        <div>
+          <label>Опыт</label>
+          <input id="exp">
+        </div>
+        <div>
+          <label>Статус</label>
+          <input id="status">
+        </div>
+      </div>
 
       <label>URL аватара</label>
-      <input id="avatar">
+      <input id="avatar" placeholder="https://...">
 
       <label>Email</label>
       <input id="email">
 
-      <label>Режим (normal / compact)</label>
-      <input id="mode" placeholder="compact">
+      <label>Режим отображения</label>
+      <select id="mode">
+        <option value="compact">Компактный (Liquid Glass)</option>
+        <option value="normal">Обычный</option>
+      </select>
 
-      <label>Discord (ссылка или ID)</label>
-      <input id="discordId">
+      <div class="section-title">Внешний вид</div>
 
-      <label>URL музыки</label>
+      <label>Основной цвет</label>
+      <div class="color-row">
+        <input type="color" id="primary">
+        <input type="text" id="primaryHex" placeholder="#7c8cff">
+      </div>
+
+      <label>Акцентный цвет</label>
+      <div class="color-row">
+        <input type="color" id="accent">
+        <input type="text" id="accentHex" placeholder="#c084fc">
+      </div>
+
+      <div class="section-title">Медиа и Discord</div>
+
+      <label>Discord (ссылка или User ID)</label>
+      <input id="discordId" placeholder="https://discord.com/users/...">
+
+      <label>URL музыки (mp3)</label>
       <input id="musicUrl">
 
       <label>Название трека</label>
@@ -118,16 +271,40 @@
       <label>Обложка музыки</label>
       <input id="musicAvatar">
 
-      <label>Новый пароль для админки (оставь пустым, чтобы не менять)</label>
+      <div class="section-title">Контент</div>
+
+      <label>Навыки (через запятую)</label>
+      <input id="skills" placeholder="HTML, CSS, JavaScript, React">
+
+      <label>Проекты (JSON)</label>
+      <textarea id="projects" rows="5" placeholder='[{"title":"Проект","desc":"Описание","link":"#"}]'></textarea>
+
+      <label>Соцсети (JSON)</label>
+      <textarea id="socials" rows="4" placeholder='[{"name":"Telegram","url":"https://t.me/","icon":"✈️"}]'></textarea>
+
+      <div class="section-title">Безопасность</div>
+
+      <label>Новый пароль админки (оставь пустым, чтобы не менять)</label>
       <input type="password" id="newPassword" placeholder="Новый пароль">
 
-      <button onclick="save()">Сохранить для всех</button>
+      <button class="btn" onclick="save()">Сохранить для всех</button>
+      <button class="btn btn-outline" onclick="logout()">Выйти</button>
       <p id="status"></p>
     </div>
 
   </div>
 
   <script>
+    // Синхронизация color + hex
+    ['primary', 'accent'].forEach(id => {
+      const color = document.getElementById(id);
+      const hex = document.getElementById(id + 'Hex');
+      color.addEventListener('input', () => hex.value = color.value);
+      hex.addEventListener('input', () => {
+        if (/^#[0-9A-Fa-f]{6}$/.test(hex.value)) color.value = hex.value;
+      });
+    });
+
     async function login() {
       const password = document.getElementById('password').value;
       const res = await fetch('/api/login', {
@@ -164,13 +341,43 @@
       document.getElementById('musicUrl').value = cfg.musicUrl || '';
       document.getElementById('musicTitle').value = cfg.musicTitle || '';
       document.getElementById('musicAvatar').value = cfg.musicAvatar || '';
+
+      document.getElementById('primary').value = cfg.primary || '#7c8cff';
+      document.getElementById('primaryHex').value = cfg.primary || '#7c8cff';
+      document.getElementById('accent').value = cfg.accent || '#c084fc';
+      document.getElementById('accentHex').value = cfg.accent || '#c084fc';
+
+      document.getElementById('skills').value = (cfg.skills || []).join(', ');
+      document.getElementById('projects').value = JSON.stringify(cfg.projects || [], null, 2);
+      document.getElementById('socials').value = JSON.stringify(cfg.socials || [], null, 2);
     }
 
     async function save() {
-      const current = await (await fetch('/api/config')).json();
+      const statusEl = document.getElementById('status');
+      statusEl.style.color = '#4ade80';
+      statusEl.textContent = 'Сохранение...';
+
+      let projects = [];
+      let socials = [];
+      try {
+        projects = JSON.parse(document.getElementById('projects').value || '[]');
+      } catch {
+        statusEl.textContent = 'Ошибка в JSON проектов';
+        statusEl.style.color = '#f87171';
+        return;
+      }
+      try {
+        socials = JSON.parse(document.getElementById('socials').value || '[]');
+      } catch {
+        statusEl.textContent = 'Ошибка в JSON соцсетей';
+        statusEl.style.color = '#f87171';
+        return;
+      }
+
+      const skillsRaw = document.getElementById('skills').value.trim();
+      const skills = skillsRaw ? skillsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
 
       const body = {
-        ...current,
         name: document.getElementById('name').value,
         title: document.getElementById('title').value,
         tagline: document.getElementById('tagline').value,
@@ -180,17 +387,20 @@
         status: document.getElementById('status').value,
         avatar: document.getElementById('avatar').value,
         email: document.getElementById('email').value,
-        mode: document.getElementById('mode').value || 'compact',
+        mode: document.getElementById('mode').value,
+        primary: document.getElementById('primary').value,
+        accent: document.getElementById('accent').value,
         discordId: document.getElementById('discordId').value,
         musicUrl: document.getElementById('musicUrl').value,
         musicTitle: document.getElementById('musicTitle').value,
-        musicAvatar: document.getElementById('musicAvatar').value
+        musicAvatar: document.getElementById('musicAvatar').value,
+        skills,
+        projects,
+        socials
       };
 
       const newPass = document.getElementById('newPassword').value.trim();
-      if (newPass) {
-        body.adminPassword = newPass;
-      }
+      if (newPass) body.adminPassword = newPass;
 
       const res = await fetch('/api/config', {
         method: 'POST',
@@ -199,17 +409,20 @@
         body: JSON.stringify(body)
       });
 
-      const status = document.getElementById('status');
       if (res.ok) {
-        status.textContent = 'Сохранено! Обнови страницу сайта.';
+        statusEl.textContent = 'Сохранено! Обнови основной сайт.';
         document.getElementById('newPassword').value = '';
       } else {
-        status.textContent = 'Ошибка сохранения';
-        status.style.color = '#f87171';
+        statusEl.textContent = 'Ошибка сохранения';
+        statusEl.style.color = '#f87171';
       }
     }
 
-    // Enter для входа
+    function logout() {
+      document.cookie = 'token=; Max-Age=0; path=/';
+      location.reload();
+    }
+
     document.getElementById('password').addEventListener('keydown', e => {
       if (e.key === 'Enter') login();
     });
