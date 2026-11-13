@@ -33,7 +33,7 @@ const DEFAULTS = {
     { name: 'VK', url: 'https://vk.com/', icon: '🌐' }
   ],
   password: 'admin123',
-  remoteConfigUrl: ''
+  remoteConfigUrl: 'https://backend-bio.up.railway.app/api/config'
 };
 
 /* ========== STATE ========== */
