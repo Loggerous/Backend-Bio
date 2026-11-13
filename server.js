@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
@@ -9,17 +8,16 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// === НАСТРОЙКИ (ОБЯЗАТЕЛЬНО ПОМЕНЯЙ) ===
-const ADMIN_PASSWORD = 'твой_сложный_пароль_здесь';   // пароль для входа в /admin
-const JWT_SECRET = 'очень_длинный_случайный_секрет_12345abcde'; // любой длинный текст
-// ======================================
+// ================== НАСТРОЙКИ ==================
+const JWT_SECRET = 'очень_длинный_случайный_секрет_12345abcde_поменяй_меня';
+// ===============================================
 
-// Файл, где хранится конфиг
 const CONFIG_FILE = path.join(__dirname, 'config.json');
 
-// Если файла нет — создаём дефолтный
+// Создаём config.json, если его нет
 if (!fs.existsSync(CONFIG_FILE)) {
   const defaultConfig = {
+    adminPassword: 'admin123',          // <-- пароль для /admin
     name: 'Имя Фамилия',
     title: 'Разработчик · Дизайнер · Создатель',
     tagline: 'Привет! Это мой личный сайт.',
@@ -48,20 +46,28 @@ if (!fs.existsSync(CONFIG_FILE)) {
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(defaultConfig, null, 2));
 }
 
+function getConfig() {
+  return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+}
+
+function saveConfig(data) {
+  fs.writeFileSync(CONFIG_FILE, JSON.stringify(data, null, 2));
+}
+
 app.use(cors({
-  origin: true,          // разрешаем запросы с твоего сайта
+  origin: true,
   credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static('public')); // сюда положи index.html, styles.css, script.js
+app.use(express.static('public'));
 
-// ========== ПУБЛИЧНЫЙ КОНФИГ (для всех посетителей) ==========
+// ========== ПУБЛИЧНЫЙ КОНФИГ (без пароля) ==========
 app.get('/api/config', (req, res) => {
   try {
-    const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
-    // пароль никогда не отдаём
-    res.json(config);
+    const config = getConfig();
+    const { adminPassword, ...publicConfig } = config; // пароль не отдаём
+    res.json(publicConfig);
   } catch (e) {
     res.status(500).json({ error: 'Не удалось загрузить конфиг' });
   }
@@ -80,35 +86,45 @@ function authMiddleware(req, res, next) {
   }
 }
 
-// ========== ВХОД В АДМИНКУ ==========
-app.post('/api/login', async (req, res) => {
+// ========== ВХОД ==========
+app.post('/api/login', (req, res) => {
   const { password } = req.body;
-  if (password !== ADMIN_PASSWORD) {
+  const config = getConfig();
+
+  if (password !== config.adminPassword) {
     return res.status(401).json({ error: 'Неверный пароль' });
   }
 
   const token = jwt.sign({ admin: true }, JWT_SECRET, { expiresIn: '7d' });
+
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: true,
+    sameSite: 'none',
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
+
   res.json({ success: true });
 });
 
-// ========== СОХРАНЕНИЕ КОНФИГА (только админ) ==========
+// ========== СОХРАНЕНИЕ КОНФИГА ==========
 app.post('/api/config', authMiddleware, (req, res) => {
   try {
-    // Сохраняем всё, что пришло (пароль сайта больше не нужен)
-    fs.writeFileSync(CONFIG_FILE, JSON.stringify(req.body, null, 2));
+    const current = getConfig();
+    // Сохраняем всё, что пришло + не теряем adminPassword, если его не передали
+    const newConfig = {
+      ...current,
+      ...req.body,
+      adminPassword: req.body.adminPassword || current.adminPassword
+    };
+    saveConfig(newConfig);
     res.json({ success: true });
   } catch (e) {
     res.status(500).json({ error: 'Ошибка сохранения' });
   }
 });
 
-// ========== ПРОВЕРКА, залогинен ли ==========
+// ========== ПРОВЕРКА АВТОРИЗАЦИИ ==========
 app.get('/api/me', authMiddleware, (req, res) => {
   res.json({ admin: true });
 });
@@ -118,6 +134,11 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+// Главная страница
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.listen(PORT, () => {
-  console.log(`Сервер запущен: http://localhost:${PORT}`);
+  console.log(`Сервер запущен на порту ${PORT}`);
 });
