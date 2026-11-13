@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Админка</title>
+  <style>
+    body { font-family: system-ui; background: #111; color: #eee; max-width: 700px; margin: 40px auto; padding: 20px; }
+    input, textarea, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff; }
+    button { background: #6366f1; cursor: pointer; font-weight: bold; }
+    button:hover { background: #4f46e5; }
+    .hidden { display: none; }
+    label { display: block; margin-top: 16px; color: #aaa; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div id="login">
+    <h1>Вход в админку</h1>
+    <input type="password" id="password" placeholder="Пароль">
+    <button onclick="login()">Войти</button>
+    <p id="error" style="color:#f87171"></p>
+  </div>
+
+  <div id="panel" class="hidden">
+    <h1>Редактор сайта</h1>
+    <p>Изменения сразу видны всем посетителям</p>
+
+    <label>Имя</label>
+    <input id="name">
+
+    <label>Заголовок</label>
+    <input id="title">
+
+    <label>Описание</label>
+    <textarea id="tagline" rows="2"></textarea>
+
+    <label>Город</label>
+    <input id="city">
+
+    <label>Discord (ссылка или ID)</label>
+    <input id="discordId">
+
+    <label>URL музыки</label>
+    <input id="musicUrl">
+
+    <label>Название трека</label>
+    <input id="musicTitle">
+
+    <label>Режим (normal / compact)</label>
+    <input id="mode">
+
+    <br><br>
+    <button onclick="save()">Сохранить для всех</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    async function login() {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ password: document.getElementById('password').value })
+      });
+      if (res.ok) {
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('panel').classList.remove('hidden');
+        loadConfig();
+      } else {
+        document.getElementById('error').textContent = 'Неверный пароль';
+      }
+    }
+
+    async function loadConfig() {
+      const res = await fetch('/api/config');
+      const cfg = await res.json();
+      document.getElementById('name').value = cfg.name || '';
+      document.getElementById('title').value = cfg.title || '';
+      document.getElementById('tagline').value = cfg.tagline || '';
+      document.getElementById('city').value = cfg.city || '';
+      document.getElementById('discordId').value = cfg.discordId || '';
+      document.getElementById('musicUrl').value = cfg.musicUrl || '';
+      document.getElementById('musicTitle').value = cfg.musicTitle || '';
+      document.getElementById('mode').value = cfg.mode || 'compact';
+    }
+
+    async function save() {
+      const body = {
+        name: document.getElementById('name').value,
+        title: document.getElementById('title').value,
+        tagline: document.getElementById('tagline').value,
+        city: document.getElementById('city').value,
+        discordId: document.getElementById('discordId').value,
+        musicUrl: document.getElementById('musicUrl').value,
+        musicTitle: document.getElementById('musicTitle').value,
+        mode: document.getElementById('mode').value,
+        // остальные поля можно добавить по аналогии
+      };
+
+      // Сначала загружаем текущий полный конфиг и мержим
+      const current = await (await fetch('/api/config')).json();
+      const full = { ...current, ...body };
+
+      const res = await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(full)
+      });
+
+      document.getElementById('status').textContent = res.ok ? 'Сохранено!' : 'Ошибка';
+    }
+  </script>
+</body>
+</html>
